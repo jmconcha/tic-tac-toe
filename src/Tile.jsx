@@ -12,6 +12,7 @@ const StyledTile = styled.div`
   font-weight: bold;
   font-size: 30px;
   user-select: none;
+  cursor: pointer;
 
   :nth-child(3),
   :nth-child(6),

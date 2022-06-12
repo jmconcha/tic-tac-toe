@@ -1,4 +1,29 @@
-function GameStatus({ currentPlayer, winner, isGameOver, playerMovesHistory, setPlayerWentBackTo }) {
+import React, { useContext } from 'react';
+import styled from 'styled-components';
+
+import GameContext from './GameContext';
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  button {
+    flex: 1;
+    margin: 5px 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+`;
+
+function GameStatus() {
+  const {
+    currentPlayer,
+    winner,
+    playerMovesHistory,
+    setPlayerWentBackTo,
+    isGameOver,
+  } = useContext(GameContext);
+
   let prompt = isGameOver ? `Winner: ${winner}` : `Next player: ${currentPlayer}`;
 
   const handleClick = index => {
@@ -6,19 +31,20 @@ function GameStatus({ currentPlayer, winner, isGameOver, playerMovesHistory, set
   };
 
   const moveHistory = playerMovesHistory.map((_, index) => (
-    <div key={index}>
+    <StyledButtonContainer key={index}>
       {`${index + 1 }. `}
-      <button onClick={() => handleClick(index)}>Go to {index === 0 ? 'game start' : `move # ${index}`}</button>
-    </div>
+      <button onClick={() => handleClick(index)}>Go to {index === 0 ? 'game start' : `move #${index}`}</button>
+    </StyledButtonContainer>
   ));
+  
 
   return (
-    <>
-      <p>
+    <div>
+      <span>
         {prompt}
-      </p>
+      </span>
       {moveHistory}
-    </>
+    </div>
   )
 }
 

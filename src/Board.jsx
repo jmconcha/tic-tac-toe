@@ -1,24 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
 
-import Tile from './Tile';
-import GameStatus from './GameStatus';
+import { initializePlayerMoveData, WINNING_COMBINATIONS } from './utils';
+import GameContext from './GameContext';
 
-const BOARD = {
-  row: 3,
-  column: 3,
-};
-const WINNING_COMBINATIONS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
+import Tile from './Tile';
 
 const StyledBoard = styled.div`
   margin: 50px auto;
@@ -27,12 +14,6 @@ const StyledBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(3, auto);
 `;
-
-function initializePlayerMoveData() {
-  return Array.from({ length: BOARD.row }).map(
-    (_, rowIndex) => Array(BOARD.column).fill(null)
-  );
-}
 
 function updatePlayerMoves(playerMoves, currentPlayer, targetLocation) {
   return playerMoves.map((rowValues, rowIndex) => {
@@ -58,11 +39,14 @@ function checkWinner(playerMoves, currentPlayer) {
 function Board() {
   const initialPlayerMoveData = initializePlayerMoveData();
   const [playerMoves, setPlayerMoves] = useState(initialPlayerMoveData);
-  const [playerMovesHistory, setPlayerMovesHistory] = useState([initialPlayerMoveData]);
-  const [currentPlayer, setCurrentPlayer] = useState('X');
-  const [winner, setWinner] = useState('');
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [playerWentBackTo, setPlayerWentBackTo] = useState(-1);
+
+  const {
+    currentPlayer, setCurrentPlayer,
+    setWinner,
+    playerMovesHistory, setPlayerMovesHistory,
+    playerWentBackTo, setPlayerWentBackTo,
+    isGameOver, setIsGameOver,
+   } = useContext(GameContext);
 
   const handlePlayerMoves = (targetLocation) => {
     const targetPositionIsNotEmpty  = playerMoves[targetLocation.x][targetLocation.y] !== null;
@@ -93,7 +77,7 @@ function Board() {
       setWinner(previousPlayer);
       setIsGameOver(isPreviousPlayerWinner);
     }
-  }, [playerMoves, currentPlayer]);
+  }, [playerMoves, currentPlayer, setWinner, setIsGameOver]);
 
   useEffect(() => {
     if (playerWentBackTo > -1) {
@@ -101,7 +85,7 @@ function Board() {
       const nextPlayer = playerWentBackTo % 2 === 0 ? 'X' : 'O';
       setCurrentPlayer(prevState => nextPlayer);
     }
-  }, [playerMovesHistory, playerWentBackTo]);
+  }, [playerMovesHistory, playerWentBackTo, setCurrentPlayer]);
 
   return (
     <div>
@@ -118,13 +102,6 @@ function Board() {
           });
         })}
       </StyledBoard>
-      <GameStatus
-        currentPlayer={currentPlayer}
-        isGameOver={isGameOver}
-        winner={winner}
-        playerMovesHistory={playerMovesHistory}
-        setPlayerWentBackTo={setPlayerWentBackTo}
-      />
     </div>
   );
 }
