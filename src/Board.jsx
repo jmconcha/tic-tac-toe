@@ -9,7 +9,6 @@ const BOARD = {
   row: 3,
   column: 3,
 };
-const TILE_COUNT = BOARD.row * BOARD.column;
 const WINNING_COMBINATIONS = [
   [0, 1, 2],
   [3, 4, 5],
@@ -28,16 +27,6 @@ const StyledBoard = styled.div`
   display: grid;
   grid-template-columns: repeat(3, auto);
 `;
-
-// function generatePlayerMoveData(moves, player, moveLocation) {
-//   const movesData
-
-//   if (movesData[moveLocation.x][moveLocation.y] === null) {
-//     movesData[moveLocation.x][moveLocation.y] = player;
-//   }
-
-//   return movesData;
-// }
 
 function initializePlayerMoveData() {
   return Array.from({ length: BOARD.row }).map(
@@ -59,7 +48,6 @@ function updatePlayerMoves(playerMoves, currentPlayer, targetLocation) {
 
 function checkWinner(playerMoves, currentPlayer) {
   const mappedPlayerMoves = playerMoves.flat();
-  console.log('mappedPlayerMoves', mappedPlayerMoves);
   return WINNING_COMBINATIONS.some(combination => (
     mappedPlayerMoves[combination[0]] === currentPlayer &&
     mappedPlayerMoves[combination[1]] === currentPlayer &&
@@ -75,7 +63,6 @@ function Board() {
   const [winner, setWinner] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [playerWentBackTo, setPlayerWentBackTo] = useState(-1);
-  console.log('playerMovesHistory', playerMovesHistory);
 
   const handlePlayerMoves = (targetLocation) => {
     const targetPositionIsNotEmpty  = playerMoves[targetLocation.x][targetLocation.y] !== null;
@@ -84,7 +71,6 @@ function Board() {
     if (playerWentBackTo > -1) {
       setPlayerMovesHistory(prevState => {
         const prevStateClone = _.cloneDeep(prevState);
-        console.log('playerWentBackTo', playerWentBackTo);
         const newState = prevStateClone.slice(0, playerWentBackTo + 1);
         return newState;
       });
@@ -100,7 +86,6 @@ function Board() {
     setCurrentPlayer(prevState => prevState === 'X' ? 'O' : 'X');
   };
 
-  console.log('playerMoves', playerMoves);
   useEffect(() => {
     const previousPlayer = currentPlayer === 'X' ? 'O' : 'X';
     const isPreviousPlayerWinner = checkWinner(playerMoves, previousPlayer);
@@ -108,7 +93,6 @@ function Board() {
       setWinner(previousPlayer);
       setIsGameOver(isPreviousPlayerWinner);
     }
-    console.log('isCurrentPlayerWinner', isPreviousPlayerWinner);
   }, [playerMoves, currentPlayer]);
 
   useEffect(() => {
@@ -117,7 +101,7 @@ function Board() {
       const nextPlayer = playerWentBackTo % 2 === 0 ? 'X' : 'O';
       setCurrentPlayer(prevState => nextPlayer);
     }
-  }, [playerWentBackTo]);
+  }, [playerMovesHistory, playerWentBackTo]);
 
   return (
     <div>

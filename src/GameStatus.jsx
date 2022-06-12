@@ -1,6 +1,5 @@
 function GameStatus({ currentPlayer, winner, isGameOver, playerMovesHistory, setPlayerWentBackTo }) {
   let prompt = isGameOver ? `Winner: ${winner}` : `Next player: ${currentPlayer}`;
-  console.log('playerMovesHistory', playerMovesHistory);
 
   const handleClick = index => {
     setPlayerWentBackTo(index);
