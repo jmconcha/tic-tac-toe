@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
 
-import { initializePlayerMoveData, WINNING_COMBINATIONS } from './utils';
+import { BOARD, initializePlayerMoveData, WINNING_COMBINATIONS } from './utils';
 import GameContext from './GameContext';
 
 import Tile from './Tile';
@@ -86,6 +86,14 @@ function Board() {
       setCurrentPlayer(prevState => nextPlayer);
     }
   }, [playerMovesHistory, playerWentBackTo, setCurrentPlayer]);
+
+  useEffect(() => {
+    if ((playerMovesHistory.length - 1) === (BOARD.row * BOARD.column)) {
+      if (!isGameOver) {
+        setIsGameOver(true);
+      }
+    }
+  }, [isGameOver, playerMovesHistory, setIsGameOver]);
 
   return (
     <div>

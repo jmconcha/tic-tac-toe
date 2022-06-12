@@ -12,7 +12,14 @@ const StyledButtonContainer = styled.div`
     margin: 5px 5px;
     padding: 8px 12px;
     cursor: pointer;
+    font-size: 14px;
   }
+`;
+
+const StyledSpan = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 `;
 
 function GameStatus() {
@@ -24,7 +31,16 @@ function GameStatus() {
     isGameOver,
   } = useContext(GameContext);
 
-  let prompt = isGameOver ? `Winner: ${winner}` : `Next player: ${currentPlayer}`;
+  let prompt;
+  if (isGameOver) {
+    if (winner === '') {
+      prompt = "Game Over";
+    } else {
+      prompt = `Winner: ${winner}`;
+    }
+  } else {
+    prompt = `Next player: ${currentPlayer}`;
+  }
 
   const handleClick = index => {
     setPlayerWentBackTo(index);
@@ -40,9 +56,9 @@ function GameStatus() {
 
   return (
     <div>
-      <span>
+      <StyledSpan>
         {prompt}
-      </span>
+      </StyledSpan>
       {moveHistory}
     </div>
   )
