@@ -77,7 +77,8 @@ function Board() {
   const [playerWentBackTo, setPlayerWentBackTo] = useState(-1);
 
   const handlePlayerMoves = (targetLocation) => {
-    if (isGameOver) return;
+    const targetPositionIsNotEmpty  = playerMoves[targetLocation.x][targetLocation.y] !== null;
+    if (isGameOver || targetPositionIsNotEmpty) return;
 
     if (playerWentBackTo > -1) {
       setPlayerMovesHistory(prevState => {
@@ -89,16 +90,12 @@ function Board() {
     }
 
     const newPlayerMovesData = updatePlayerMoves(playerMoves, currentPlayer, targetLocation);
-
+    setPlayerMoves(newPlayerMovesData);
     setPlayerMovesHistory(prevState => ([
       ...prevState,
       newPlayerMovesData,
     ]));
-
-    setPlayerMoves(newPlayerMovesData);
     setCurrentPlayer(prevState => prevState === 'X' ? 'O' : 'X');
-
-    console.log(targetLocation);
   };
 
   console.log('playerMoves', playerMoves);

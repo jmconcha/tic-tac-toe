@@ -11,6 +11,7 @@ const StyledTile = styled.div`
   border-bottom-width: 0;
   font-weight: bold;
   font-size: 30px;
+  user-select: none;
 
   :nth-child(3),
   :nth-child(6),
