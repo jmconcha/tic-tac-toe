@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 
 import Tile from './Tile';
 import GameStatus from './GameStatus';
@@ -67,15 +68,32 @@ function checkWinner(playerMoves, currentPlayer) {
 }
 
 function Board() {
-  const [playerMoves, setPlayerMoves] = useState(initializePlayerMoveData());
+  const initialPlayerMoveData = initializePlayerMoveData();
+  const [playerMoves, setPlayerMoves] = useState(initialPlayerMoveData);
+  const [playerMovesHistory, setPlayerMovesHistory] = useState([initialPlayerMoveData]);
   const [currentPlayer, setCurrentPlayer] = useState('X');
   const [winner, setWinner] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
+  const [playerWentBackTo, setPlayerWentBackTo] = useState(-1);
 
   const handlePlayerMoves = (targetLocation) => {
     if (isGameOver) return;
 
+    if (playerWentBackTo > -1) {
+      setPlayerMovesHistory(prevState => {
+        const prevStateClone = _.cloneDeep(prevState);
+        const newState = prevStateClone.slice(0, playerWentBackTo);
+        return newState;
+      });
+      setPlayerWentBackTo(-1);
+    }
+
     const newPlayerMovesData = updatePlayerMoves(playerMoves, currentPlayer, targetLocation);
+
+    setPlayerMovesHistory(prevState => ([
+      ...prevState,
+      newPlayerMovesData,
+    ]));
 
     setPlayerMoves(newPlayerMovesData);
     setCurrentPlayer(prevState => prevState === 'X' ? 'O' : 'X');
@@ -84,7 +102,7 @@ function Board() {
   };
 
   console.log('playerMoves', playerMoves);
-  useEffect(() => {
+  useEffect((props) => {
     const previousPlayer = currentPlayer === 'X' ? 'O' : 'X';
     const isPreviousPlayerWinner = checkWinner(playerMoves, previousPlayer);
     if (isPreviousPlayerWinner) {
@@ -93,6 +111,16 @@ function Board() {
     }
     console.log('isCurrentPlayerWinner', isPreviousPlayerWinner);
   }, [playerMoves, currentPlayer]);
+
+  useEffect(() => {
+    if (playerWentBackTo > -1) {
+      setPlayerMoves(playerMovesHistory[playerWentBackTo]);
+      const tempPlayer = playerWentBackTo % 2 === 0 ? 'X' : 'O';
+      console.log('here playerWentBackTo', playerWentBackTo);
+      console.log('tempPlayer', tempPlayer);
+      setCurrentPlayer(prevState => tempPlayer);
+    }
+  }, [playerWentBackTo]);
 
   return (
     <div>
@@ -109,7 +137,13 @@ function Board() {
           });
         })}
       </StyledBoard>
-      <GameStatus currentPlayer={currentPlayer} isGameOver={isGameOver} winner={winner}/>
+      <GameStatus
+        currentPlayer={currentPlayer}
+        isGameOver={isGameOver}
+        winner={winner}
+        playerMovesHistory={playerMovesHistory}
+        setPlayerWentBackTo={setPlayerWentBackTo}
+      />
     </div>
   );
 }
